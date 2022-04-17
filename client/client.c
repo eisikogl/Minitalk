@@ -17,12 +17,18 @@ int	ft_atoi(char *str)
 void sender(int *message, int pid)
 {
     int i = 0;  
-    while (i < 7)
+    while (i < 8)
     {
         if (message[i] == 1)
-            kill(pid, SIGUSR1);   
+        {
+            if (kill(pid, SIGUSR1) == -1)
+                printf("SIGUSR1 FAILED");   
+        }
         else if (message[i] == 0)
-            kill(pid, SIGUSR2);
+        {
+            if (kill(pid, SIGUSR2) == -1)
+                printf("SIGUSR1 FAILED"); 
+        }
         i++;
         usleep(500);
     }
@@ -32,21 +38,16 @@ void sender(int *message, int pid)
 int *encoder(char c)
 {
     int *coded_char;
-    int cd;
+    int char_to_bit;
     int i;
 
     coded_char = malloc(sizeof(*coded_char) * 8);
-    cd = (int)c;
+    char_to_bit = (int)c;
     i = 7;
-    while(cd)
+    while(char_to_bit)
     {
-        coded_char[i] = cd % 2;
-        cd /= 2;
-        i--;
-    }
-    while(i >= 0)
-    {
-        coded_char[i] = 0;
+        coded_char[i] = char_to_bit % 2;
+        char_to_bit /= 2;
         i--;
     }
     return (coded_char);
@@ -63,11 +64,8 @@ int main(int argc, char **argv)
     
     while(argv[2][i])
     {
-        printf("Successfully sent characters: %d\n",i);
         message = encoder(argv[2][i]);
         sender(message, pid);
         i++;
     }
-    sleep(5);
-    
 }

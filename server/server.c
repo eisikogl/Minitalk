@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+int *decode_this;
+
 void	ft_itoa(pid_t pid)
 {
 	char	c;
@@ -13,7 +15,19 @@ void	ft_itoa(pid_t pid)
 	write(1, &c, 1);
 }
 
-char decoder(int *its_a_byte)
+int ft_pow(int i,int n)
+{
+	int power;
+	power = 1;
+	while(n != 0)
+	{
+		power = power * i;
+		n--;
+	}
+	return (power);
+}
+
+char decoder(int *get_char)
 {
 	int i;
 	int n;
@@ -23,8 +37,8 @@ char decoder(int *its_a_byte)
 	n = 7;
 	i = 0;
 	while(i < 8)
-	{
-		sum += its_a_byte[i] * (2^n);
+	{	
+		sum += (get_char[i] * ft_pow(2,n));
 		n--;
 		i++;
 	}
@@ -33,10 +47,9 @@ char decoder(int *its_a_byte)
 
 void get_char(int signum)
 {
-	static int decode_this[8];
 	static int	i = 0;
 	char	c;
-
+	
 	if (signum == SIGUSR1)
     {
 		decode_this[i++] = 1;
@@ -58,10 +71,12 @@ int main()
 	write(1, "Server Pid: ", 13);
 	ft_itoa(getpid());
 	write(1, "\n", 1);
+	decode_this = malloc(sizeof(*decode_this) * 8);
 	while(1)
 	{
 		signal(SIGUSR1,get_char);
 		signal(SIGUSR2,get_char);
+		pause();
 	}
-	pause();
+	free(decode_this);
 }
